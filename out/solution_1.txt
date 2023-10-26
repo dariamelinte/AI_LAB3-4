@@ -1,5 +1,7 @@
 Number of moves: 4
 
+Execution Time: 0.004689693450927734 seconds
+
 2 5 3
 1 0 6
 4 7 8

@@ -36,9 +36,9 @@ class State:
             self.matrix.append(row)
         
     def get_empty_cell(self):
-        for i, row in enumerate(self.matrix):
-            for j, number in enumerate(row):
-                if number == 0:
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                if self.matrix[i][j] == 0:
                     return i, j
         return 0, 0
 
@@ -89,11 +89,4 @@ class State:
 
     @staticmethod
     def is_valid_cell(cell):
-        if cell[0] < 0 or cell[0] > 2:
-            return False
-        if cell[1] < 0 or cell[1] > 2:
-            return False
-        return True
-    
-
-    
+        return 0 <= cell[0] <= 2 and 0 <= cell[1] <= 2

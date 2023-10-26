@@ -1,6 +1,6 @@
 import copy
 import logging
-import random
+import time
 
 from models.directions import Directions
 from models.state import State
@@ -21,11 +21,8 @@ def find_state(visited: set, state):
          return True
    return False
 
-def depth_limited_dfs_rec(state: State, depth, visited:set, stack):
+def depth_limited_dfs(state: State, depth, visited:set, stack):
    if state.is_final():
-      logging.info(f"Made move {len(stack) + 1}")
-      logging.info(f"[MATRIX] {state}")
-
       stack.append(copy.deepcopy(state))
       return True
 
@@ -35,9 +32,10 @@ def depth_limited_dfs_rec(state: State, depth, visited:set, stack):
    visited.add(copy.deepcopy(state))
 
    for direction in DIRECTIONS_VARIANTS:
+      logging.info(f"MOVE: {direction}")
       transition = state.get_move(direction)
       if transition is not None and not find_state(visited, transition):
-         res = depth_limited_dfs_rec(transition, depth - 1, visited, stack)
+         res = depth_limited_dfs(transition, depth - 1, visited, stack)
          if res:
             stack.append(copy.deepcopy(state))
             return True
@@ -46,7 +44,7 @@ def depth_limited_dfs_rec(state: State, depth, visited:set, stack):
 def iddfs(state, depth, stack):
     for d in range(depth + 1):
         visited = set()
-        res = depth_limited_dfs_rec(state, d, visited, stack)
+        res = depth_limited_dfs(state, d, visited, stack)
         if res:
             return True
         else:
@@ -65,17 +63,26 @@ def main():
 
    for i, actual_state in enumerate(states):
       stack = []
-      test = iddfs(actual_state, MAXDEPTH, stack)
-      if test:
-         with open(f"out/solution_{i}.txt", "w") as file:
-               file.write(f"Number of moves: {len(stack) - 1}\n\n")
-               for state in reversed(stack):
-                  state_str = "\n".join(" ".join(map(str, row)) for row in state.matrix)
-                  file.write(state_str + "\n\n")
-               
-               logging.info("------------------------------------")
-      else:
+      start_time = time.time()
+
+      result = iddfs(actual_state, MAXDEPTH, stack)
+
+      if not result:
          print("Solution not found :(")
+         continue
+
+      with open(f"out/solution_{i}.txt", "w") as file:
+         file.write(f"Number of moves: {len(stack) - 1}\n\n")
+         end_time = time.time()
+         execution_time = end_time - start_time
+         file.write(f"Execution Time: {execution_time} seconds\n\n")
+
+         for state in reversed(stack):
+            state_str = "\n".join(" ".join(map(str, row)) for row in state.matrix)
+
+            file.write(state_str + "\n\n")
+         
+         logging.info("------------------------------------")
 
 if __name__ == "__main__":
     main()
